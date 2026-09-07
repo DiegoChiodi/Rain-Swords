@@ -29,6 +29,7 @@ class GameSceneBase(arcade.View):
         self.GRAVITY = 0.5
         
         self.set_blocks()
+        self.set_elements()
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             player_sprite=self.player,
@@ -43,6 +44,9 @@ class GameSceneBase(arcade.View):
         )
 
     def set_blocks(self):
+        pass
+
+    def set_elements(self):
         pass
 
     def set_players_pos(self):

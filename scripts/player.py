@@ -1,5 +1,12 @@
 from entity import *
 from global_func import *
+from enum import Enum
+
+class State(Enum):
+    IDLE = 0
+    WALK = 1
+    JUMP = 2
+    SQUAT = 3
 
 class Player(Entity):           
     def __init__(self, numb_one : bool = True): 
@@ -17,7 +24,11 @@ class Player(Entity):
         self.JUMP_MAX : float = 1
         self.last_move_up = self.move_up
 
-        
+        self.scale_fix = self.scale
+        self.act_state = State.IDLE
+
+        self.on_sword = False
+        self.sword = None
 
         if numb_one:
             self.input_left = arcade.key.A
@@ -32,8 +43,6 @@ class Player(Entity):
             self.input_down = arcade.key.DOWN
             self.color = arcade.color.BLUE
             
-
-
     def handle_key_press(self, key):
         if key == self.input_left:
             self.move_left = True
@@ -64,7 +73,7 @@ class Player(Entity):
     def update(self, delta):
         super().update(delta)
 
-        self.state_machine()
+        self.state_machine(delta)
 
         if self.last_move_up != self.move_up and self.move_up:
             self.jump()
@@ -79,7 +88,10 @@ class Player(Entity):
         self.scale_x = 1 * self.scale[0] if self.move_right else -1 * self.scale[0] if self.move_left else self.scale_x
 
     def set_change(self, delta):
-        self.change_x = lerp(self.change_x, self.direction.x * self.speed, 10 * delta)
+        if self.move_down:
+            self.change_x = lerp(self.change_x, self.direction.x * self.speed / 2, 10 * delta)
+        else:
+            self.change_x = lerp(self.change_x, self.direction.x * self.speed, 10 * delta)
 
     def jump(self):
         if self.jumps > 0:
@@ -89,22 +101,50 @@ class Player(Entity):
     def recharge_jump(self):
         self.jumps = self.JUMP_MAX
 
-    def state_machine(self):
+    def state_machine(self, delta):
+
+        match self.act_state:
+            case State.IDLE:
+                self.idle_ani(delta)
+            case State.WALK:
+                self.walk_ani(delta)
+            case State.JUMP:
+                self.jump_ani(delta)
+            case State.SQUAT:
+                self.squatting_ani(delta)
+
         if self.change_y != 0:
-            self.jump_ani()
+            self.act_state = State.JUMP
+            return
+        
+        if (self.move_down):
+            self.act_state = State.SQUAT
             return
 
-        if self.center_x == 0:
-            self.idle_ani()
+        if abs(self.change_x) >= 2.0:
+            self.act_state = State.WALK
             return
+        
+        self.act_state = State.IDLE
 
-        self.walk_ani()
 
-    def walk_ani(self):
+    def walk_ani(self, delta):
+        self.scale = (
+            self.scale[0],
+            lerp(self.scale[1], self.scale_fix[1] - self.scale_fix[1] / 10.0, delta * 20.0)
+        )
+
+    def jump_ani(self, delta):
         pass
 
-    def jump_ani(self):
-        pass
+    def idle_ani(self, delta):
+        self.scale = (
+            self.scale_fix[0],
+            lerp(self.scale[1], self.scale_fix[1], delta * 20),
+        )
 
-    def idle_ani(self):
-        pass
+    def squatting_ani(self, delta):
+        self.scale = (
+            self.scale[0],
+            lerp(self.scale[1], self.scale_fix[1] / 2, delta * 20)
+        )

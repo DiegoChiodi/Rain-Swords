@@ -10,16 +10,18 @@ class StartView(arcade.View):
     
     def on_draw(self):
         self.clear()
-        
-        arcade.draw_text(
-            text="Pressione Enter para jogar",
-            x=SCREEN_WIDTH // 2,
-            y=SCREEN_HEIGHT // 2,
-            color=arcade.color.GREEN,
-            font_size=100,
+
+        text = arcade.Text(
+            "Pressione Enter para jogar",
+            SCREEN_WIDTH // 2,
+            SCREEN_HEIGHT // 2,
+            arcade.color.GREEN,
+            100,
             anchor_x="center",
-            anchor_y="center",
+            anchor_y="center"
         )
+
+        text.draw()
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.J or key == arcade.key.ENTER:

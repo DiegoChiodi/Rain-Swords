@@ -14,3 +14,9 @@ class Map_1(GameSceneBase):
         for x in range(32, SCREEN_WIDTH + 32, 64):
             self.bloco = Block(x=x, y=64)
             self.list_blocks.append(self.bloco)
+    
+    def set_elements(self):
+        self.sword = arcade.Sprite("../assets/player.png", 1.0)
+        self.sword.center_x = 400
+        self.sword.center_y = 200
+        self.obj_list.append(self.sword)
