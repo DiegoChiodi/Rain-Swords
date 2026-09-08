@@ -12,7 +12,9 @@ class GameSceneBase(arcade.View):
 
         arcade.set_background_color(arcade.color.SKY_BLUE)
 
-        self.obj_list = arcade.SpriteList()
+        self.player_list = arcade.SpriteList()
+        self.sword_list = arcade.SpriteList()
+        self.list_blocks = arcade.SpriteList()
 
         self.cam = arcade.Camera2D()
 
@@ -23,8 +25,8 @@ class GameSceneBase(arcade.View):
 
         self.player.position, self.player2.position = self.set_players_pos()
 
-        self.obj_list.append(self.player)
-        self.obj_list.append(self.player2)
+        self.player_list.append(self.player)
+        self.player_list.append(self.player2)
 
         self.GRAVITY = 0.5
         
@@ -53,23 +55,39 @@ class GameSceneBase(arcade.View):
         return (200, 200), (400, 200)
         
     def on_update(self, delta_time):
-        if self.stop_game:            
-            self.obj_list.update(delta_time)
-            self.physics_engine.update()
-            self.physics_engine2.update()
+        if not self.stop_game:
+            return    
+        
+        self.player_list.update(delta_time)
+        self.sword_list.update(delta_time)
 
-            if self.physics_engine.can_jump():
-                self.player.recharge_jump()
+        self.physics_engine.update()
+        self.physics_engine2.update()
 
-            if self.physics_engine2.can_jump():
-                self.player2.recharge_jump()
+        for sword in self.sword_list:
+            for player in arcade.check_for_collision_with_list(sword, self.player_list):
+                player.col_sword(sword)
+                sword.col_player(player)
+                    
+
+        #for sword in col_swo_with_pla:
+            
+
+        if self.physics_engine.can_jump():
+            self.player.recharge_jump()
+
+        if self.physics_engine2.can_jump():
+            self.player2.recharge_jump()
+
+        
     
     def on_draw(self):
         self.clear()
 
         self.cam.use()
 
-        self.obj_list.draw()
+        self.player_list.draw()
+        self.sword_list.draw()
         self.list_blocks.draw()
 
         self.cam_gui.use()

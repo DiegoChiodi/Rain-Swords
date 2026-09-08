@@ -148,3 +148,7 @@ class Player(Entity):
             self.scale[0],
             lerp(self.scale[1], self.scale_fix[1] / 2, delta * 20)
         )
+
+    def col_sword(self, sword):
+        self.on_sword = True
+        self.sword = sword
