@@ -1,6 +1,7 @@
 import arcade
 import global_func
 from player import Player
+from sword import Sword, State
 
 SCREEN_WIDTH, SCREEN_HEIGHT = arcade.get_display_size()
 map_width, map_height = SCREEN_WIDTH, SCREEN_HEIGHT
@@ -67,7 +68,13 @@ class GameSceneBase(arcade.View):
         for sword in self.sword_list:
             for player in arcade.check_for_collision_with_list(sword, self.player_list):
                 player.col_sword(sword)
-                sword.col_player(player)
+                sword.col_player()
+        
+        for sword in self.sword_list:
+            for block in arcade.check_for_collision_with_list(sword, self.list_blocks):
+                sword.state = State.IDLE
+                sword.change_x = 0
+                sword.change_y = 0
                     
 
         #for sword in col_swo_with_pla:

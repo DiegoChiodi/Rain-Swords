@@ -1,12 +1,16 @@
 from entity import *
 from global_func import *
 from enum import Enum
+from sword import Sword
 
 class State(Enum):
     IDLE = 0
     WALK = 1
     JUMP = 2
     SQUAT = 3
+
+def sign(x):
+    return (x > 0) - (x < 0)
 
 class Player(Entity):           
     def __init__(self, numb_one : bool = True): 
@@ -27,7 +31,6 @@ class Player(Entity):
         self.scale_fix = self.scale
         self.act_state = State.IDLE
 
-        self.on_sword = False
         self.sword = None
 
         if numb_one:
@@ -35,12 +38,15 @@ class Player(Entity):
             self.input_right = arcade.key.D
             self.input_up = arcade.key.W
             self.input_down = arcade.key.S
+            self.input_throw = arcade.key.SPACE
             self.color = arcade.color.RED
+
         else:
             self.input_left = arcade.key.LEFT
             self.input_right = arcade.key.RIGHT
             self.input_up = arcade.key.UP
             self.input_down = arcade.key.DOWN
+            self.input_throw = arcade.key.ENTER
             self.color = arcade.color.BLUE
             
     def handle_key_press(self, key):
@@ -55,6 +61,10 @@ class Player(Entity):
 
         if key == self.input_up:
             self.move_up = True
+
+        if key == self.input_throw and self.sword:
+            self.sword.throwning()
+            self.sword = None
             
 
     def handle_key_release(self, key):
@@ -82,6 +92,9 @@ class Player(Entity):
         
         if self.change_y < 0:
             self.change_y *= 1.05
+
+        if self.sword:
+            self.sword.carried(self.center_x, self.center_y, sign(self.scale_x))
         
     def set_direction(self):
         self.direction = Vec2((self.move_right - self.move_left), self.move_up)
@@ -102,7 +115,6 @@ class Player(Entity):
         self.jumps = self.JUMP_MAX
 
     def state_machine(self, delta):
-
         match self.act_state:
             case State.IDLE:
                 self.idle_ani(delta)
@@ -150,5 +162,4 @@ class Player(Entity):
         )
 
     def col_sword(self, sword):
-        self.on_sword = True
         self.sword = sword

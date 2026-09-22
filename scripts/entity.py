@@ -28,16 +28,10 @@ class Entity(arcade.Sprite):
         )
     
     def check_exit_x(self):
-        if (self.right > SCREEN_WIDTH):
-            self.dieded()
-        elif (self.left < 0):
-            self.dieded()
+        pass
 
     def check_exit_y(self):
-        if (self.top > SCREEN_HEIGHT):
-            self.dieded()
-        elif (self.bottom < 0):
-           self.dieded()
+        pass
     
     def dieded(self):
         pass
