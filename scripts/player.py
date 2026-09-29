@@ -1,7 +1,7 @@
 from entity import *
 from global_func import *
 from enum import Enum
-from sword import Sword
+from sword import *
 
 class State(Enum):
     IDLE = 0
@@ -31,7 +31,7 @@ class Player(Entity):
         self.scale_fix = self.scale
         self.act_state = State.IDLE
 
-        self.sword = None
+        self.sword : Sword = None
 
         if numb_one:
             self.input_left = arcade.key.A
@@ -94,11 +94,13 @@ class Player(Entity):
             self.change_y *= 1.05
 
         if self.sword:
-            self.sword.carried(self.center_x, self.center_y, sign(self.scale_x))
+            self.sword.carried(self.center_x, self.center_y)
         
     def set_direction(self):
         self.direction = Vec2((self.move_right - self.move_left), self.move_up)
         self.scale_x = 1 * self.scale[0] if self.move_right else -1 * self.scale[0] if self.move_left else self.scale_x
+        if self.sword and self.direction[0] != 0:
+            self.sword.set_direction(self.direction[0])
 
     def set_change(self, delta):
         if self.move_down:
@@ -163,3 +165,7 @@ class Player(Entity):
 
     def col_sword(self, sword):
         self.sword = sword
+
+    def dieded(self):
+        self.remove_from_sprite_lists()
+        return super().dieded()

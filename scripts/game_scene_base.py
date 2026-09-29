@@ -1,11 +1,10 @@
 import arcade
-import global_func
-from player import Player
-from sword import Sword, State
+from global_func import *
+from block import *
+from player import *
 
 SCREEN_WIDTH, SCREEN_HEIGHT = arcade.get_display_size()
 map_width, map_height = SCREEN_WIDTH, SCREEN_HEIGHT
-
 
 class GameSceneBase(arcade.View):
     def __init__(self):
@@ -13,9 +12,9 @@ class GameSceneBase(arcade.View):
 
         arcade.set_background_color(arcade.color.SKY_BLUE)
 
-        self.player_list = arcade.SpriteList()
-        self.sword_list = arcade.SpriteList()
-        self.list_blocks = arcade.SpriteList()
+        self.player_list : arcade.SpriteList[Player]= arcade.SpriteList()
+        self.sword_list : arcade.SpriteList[Sword] = arcade.SpriteList()
+        self.list_blocks : arcade.SpriteList[Block]= arcade.SpriteList()
 
         self.cam = arcade.Camera2D()
 
@@ -67,11 +66,17 @@ class GameSceneBase(arcade.View):
 
         for sword in self.sword_list:
             for player in arcade.check_for_collision_with_list(sword, self.player_list):
-                player.col_sword(sword)
-                sword.col_player()
+                match sword.state:
+                    case State_S.IDLE:
+                        sword.col_player()
+                        player.col_sword(sword)
+                    case State_S.THROWN:
+                        player.dieded()
+                
+
         
         for sword in self.sword_list:
-            for block in arcade.check_for_collision_with_list(sword, self.list_blocks):
+            if arcade.check_for_collision_with_list(sword, self.list_blocks):
                 sword.state = State.IDLE
                 sword.change_x = 0
                 sword.change_y = 0
@@ -85,6 +90,7 @@ class GameSceneBase(arcade.View):
 
         if self.physics_engine2.can_jump():
             self.player2.recharge_jump()
+        
 
         
     
@@ -98,18 +104,6 @@ class GameSceneBase(arcade.View):
         self.list_blocks.draw()
 
         self.cam_gui.use()
-
-        if False:
-            color = arcade.color.RED if self.player.hot else arcade.color.BLUE
-            arcade.draw_text(
-                f"O jogador {jogador} ganhou!",
-                x=SCREEN_WIDTH // 2,
-                y=SCREEN_HEIGHT // 2,
-                color=color,
-                font_size=100,
-                anchor_x="center",
-                anchor_y="center"
-            )
 
     def on_key_press(self, key, modifiers):
         self.player.handle_key_press(key)
