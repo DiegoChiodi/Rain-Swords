@@ -9,8 +9,6 @@ class State(Enum):
     JUMP = 2
     SQUAT = 3
 
-
-
 def sign(x):
     return (x > 0) - (x < 0)
 
@@ -32,6 +30,7 @@ class Player(Entity):
 
         self.scale_fix = self.scale
         self.act_state = State.IDLE
+        self.facing_direction = 1
 
         self.sword : Sword = None
 
@@ -102,7 +101,11 @@ class Player(Entity):
         
     def set_direction(self):
         self.direction = Vec2((self.move_right - self.move_left), self.move_up)
-        self.scale_x = 1 * self.scale[0] if self.move_right else -1 * self.scale[0] if self.move_left else self.scale_x
+        if self.move_right:
+            self.facing_direction = 1
+        elif self.move_left:
+            self.facing_direction = -1
+        self.scale_x = self.facing_direction * self.scale[0]
         if self.sword and self.direction[0] != 0:
             self.sword.set_direction(self.direction[0])
 
@@ -131,7 +134,7 @@ class Player(Entity):
             case State.SQUAT:
                 self.squatting_ani(delta)
 
-        if self.change_y != 0:
+        if self.jumps < self.JUMP_MAX:
             self.act_state = State.JUMP
             return
         
@@ -148,23 +151,34 @@ class Player(Entity):
 
     def walk_ani(self, delta):
         self.scale = (
-            self.scale[0],
+            self.facing_direction * lerp(abs(self.scale[0]), self.scale_fix[0] + self.scale_fix[0] / 10.0, delta * 20.0),
             lerp(self.scale[1], self.scale_fix[1] - self.scale_fix[1] / 10.0, delta * 20.0)
         )
 
     def jump_ani(self, delta):
-        pass
+        if self.change_y > 0:
+            target_scale_x = self.scale_fix[0] * 0.8
+            target_scale_y = self.scale_fix[1] * 1.2
+        else:
+            target_scale_x = self.scale_fix[0] * 1.2
+            target_scale_y = self.scale_fix[1] * 0.8
+
+        self.scale = (
+            self.facing_direction * lerp(abs(self.scale[0]), target_scale_x, delta * 20.0),
+            lerp(self.scale[1], target_scale_y, delta * 20.0),
+        )
 
     def idle_ani(self, delta):
         self.scale = (
-            self.scale_fix[0],
-            lerp(self.scale[1], self.scale_fix[1], delta * 20),
+            self.facing_direction * lerp(abs(self.scale[0]), self.scale_fix[0], delta * 10.0),
+            lerp(self.scale[1], self.scale_fix[1], delta * 10.0),
         )
 
     def squatting_ani(self, delta):
+        squat_progress = min(delta * self.SQUATING_SPEED, 1.0)
         self.scale = (
-            self.scale[0],
-            lerp(self.scale[1], self.scale_fix[1] / 2.25, delta * self.SQUATING_SPEED)
+            self.facing_direction * lerp(abs(self.scale[0]), self.scale_fix[0] * 1.15, squat_progress),
+            max(lerp(self.scale[1], self.scale_fix[1] * 0.45, squat_progress), self.scale_fix[1] * 0.45)
         )
 
     def col_sword(self, sword):

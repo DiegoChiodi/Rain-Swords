@@ -6,7 +6,7 @@ class State_S(Enum):
     THROWN = 1
     CARRIED = 2
 
-THROWN_FORCE = 10.0
+THROWN_FORCE = 15.0
 
 CARRIED_POS_X = 20
 CARRIED_POS_Y = 20
@@ -16,6 +16,7 @@ class Sword(arcade.Sprite):
         super().__init__("../assets/player.png", 1.0)
         self.state : State_S = State_S.IDLE
         self.direction = 1
+        self.set_idle()
     
     def update(self, delta_time: float = 1 / 60):
         super().update(delta_time)
@@ -24,7 +25,7 @@ class Sword(arcade.Sprite):
     def state_machine(self, delta_time: float = 1 / 60):
         match(self.state):
             case State_S.IDLE:
-                pass
+                self.idling()
             case State_S.THROWN:
                 self.thrown(delta_time)
 
@@ -37,8 +38,23 @@ class Sword(arcade.Sprite):
             case State_S.CARRIED:
                 pass
 
+    def idling(self):
+        pass
+    
+
     def thrown(self, delta_time: float = 1 / 60):
         self.center_x += self.change_x * delta_time
+        self.thrown_elapsed = getattr(self, "thrown_elapsed", 0) + delta_time
+        if self.thrown_elapsed >= 4:
+            self.set_idle()
+            self.thrown_elapsed = 0
+
+    def set_idle(self):
+        self.state = State_S.IDLE
+        self.change_x = 0
+        self.angle = 0
+        self.change_y = -4
+
 
     def carried(self, pla_cen_x, pla_cen_y):
         self.center_x = pla_cen_x + (CARRIED_POS_X * self.direction)
@@ -48,7 +64,6 @@ class Sword(arcade.Sprite):
 
     def throwning(self):
         self.state = State_S.THROWN
-        print("direction: ", self.direction)
         self.center_x += self.direction * 30
         self.change_x = self.direction * THROWN_FORCE
         self.angle = 90 * self.direction

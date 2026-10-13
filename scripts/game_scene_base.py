@@ -12,6 +12,8 @@ class GameSceneBase(arcade.View):
 
         arcade.set_background_color(arcade.color.SKY_BLUE)
 
+        self.stop_game : bool = False
+
         self.player_list : arcade.SpriteList[Player]= arcade.SpriteList()
         self.sword_list : arcade.SpriteList[Sword] = arcade.SpriteList()
         self.list_blocks : arcade.SpriteList[Block]= arcade.SpriteList()
@@ -56,7 +58,7 @@ class GameSceneBase(arcade.View):
         
     def on_update(self, delta_time):
         if not self.stop_game:
-            return    
+            return   
         
         self.player_list.update(delta_time)
         self.sword_list.update(delta_time)
@@ -77,9 +79,9 @@ class GameSceneBase(arcade.View):
         
         for sword in self.sword_list:
             if arcade.check_for_collision_with_list(sword, self.list_blocks):
-                sword.state = State.IDLE
-                sword.change_x = 0
+                sword.state = State_S.IDLE
                 sword.change_y = 0
+
                     
 
         #for sword in col_swo_with_pla:
@@ -109,7 +111,7 @@ class GameSceneBase(arcade.View):
         self.player.handle_key_press(key)
         self.player2.handle_key_press(key)
 
-        if (key == arcade.key.R or key == arcade.key.ENTER or key == arcade.key.SPACE) and not self.stop_game:
+        if key == arcade.key.NUM_5 or key == arcade.key.KEY_5:
             map_scene = type(self)()
             self.window.show_view(map_scene)
             
