@@ -17,6 +17,9 @@ class Map_1(GameSceneBase):
     
     def set_elements(self):
         self.sword = Sword()
-        self.sword.center_x = 400
+        self.sword.center_x = SCREEN_WIDTH // 2
         self.sword.center_y = 200
         self.sword_list.append(self.sword)
+
+    def set_players_pos(self):
+        return (200, 800), (SCREEN_WIDTH - 200, 800)

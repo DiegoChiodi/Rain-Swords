@@ -9,6 +9,8 @@ class State(Enum):
     JUMP = 2
     SQUAT = 3
 
+
+
 def sign(x):
     return (x > 0) - (x < 0)
 
@@ -32,6 +34,8 @@ class Player(Entity):
         self.act_state = State.IDLE
 
         self.sword : Sword = None
+
+        self.SQUATING_SPEED = 30.0
 
         if numb_one:
             self.input_left = arcade.key.A
@@ -160,7 +164,7 @@ class Player(Entity):
     def squatting_ani(self, delta):
         self.scale = (
             self.scale[0],
-            lerp(self.scale[1], self.scale_fix[1] / 2, delta * 20)
+            lerp(self.scale[1], self.scale_fix[1] / 2.25, delta * self.SQUATING_SPEED)
         )
 
     def col_sword(self, sword):

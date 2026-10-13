@@ -6,7 +6,10 @@ class State_S(Enum):
     THROWN = 1
     CARRIED = 2
 
-THROWN_FORCE = 2.5
+THROWN_FORCE = 10.0
+
+CARRIED_POS_X = 20
+CARRIED_POS_Y = 20
 
 class Sword(arcade.Sprite):
     def __init__(self):
@@ -38,12 +41,17 @@ class Sword(arcade.Sprite):
         self.center_x += self.change_x * delta_time
 
     def carried(self, pla_cen_x, pla_cen_y):
-        self.center_x = pla_cen_x + (20 * self.direction)
-        self.center_y = pla_cen_y + 20
+        self.center_x = pla_cen_x + (CARRIED_POS_X * self.direction)
+        self.center_y = pla_cen_y + CARRIED_POS_Y
+        self.angle = 45 * self.direction
+        self.scale_x = self.direction
 
     def throwning(self):
         self.state = State_S.THROWN
+        print("direction: ", self.direction)
+        self.center_x += self.direction * 30
         self.change_x = self.direction * THROWN_FORCE
+        self.angle = 90 * self.direction
 
     def set_direction(self, direction):
         self.direction = direction
