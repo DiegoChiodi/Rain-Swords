@@ -182,6 +182,8 @@ class Player(Entity):
         )
 
     def col_sword(self, sword):
+        if self.sword:
+            return
         self.sword = sword
 
     def dieded(self):

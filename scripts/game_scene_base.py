@@ -67,20 +67,35 @@ class GameSceneBase(arcade.View):
         self.physics_engine2.update()
 
         for sword in self.sword_list:
+            for sword2 in self.sword_list:
+                if sword2 == sword:
+                    continue
+
+                if arcade.check_for_collision(sword, sword2):
+                    if sword.state == State_S.THROWN:
+                        if sword2.state == State_S.THROWN:
+                            sword.set_idle()
+                            sword2.set_idle()
+
+                        if sword2.state == State_S.CARRIED:
+                            sword.set_idle()
+
             for player in arcade.check_for_collision_with_list(sword, self.player_list):
                 match sword.state:
                     case State_S.IDLE:
+                        if player.sword:
+                            continue
                         sword.col_player()
+                        
                         player.col_sword(sword)
                     case State_S.THROWN:
                         player.dieded()
-                
 
-        
-        for sword in self.sword_list:
             if arcade.check_for_collision_with_list(sword, self.list_blocks):
                 sword.state = State_S.IDLE
                 sword.change_y = 0
+
+                    
 
                     
 

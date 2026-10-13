@@ -8,7 +8,7 @@ class State_S(Enum):
 
 THROWN_FORCE = 15.0
 
-CARRIED_POS_X = 20
+CARRIED_POS_X = 50
 CARRIED_POS_Y = 20
 
 class Sword(arcade.Sprite):
