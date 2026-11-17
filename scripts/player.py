@@ -186,6 +186,26 @@ class Player(Entity):
             return
         self.sword = sword
 
+    def is_defending(self):
+        return self.sword is not None and self.act_state == State.IDLE
+
+    def respawn(self, position, facing_direction):
+        self.position = position
+        self.change_x = 0
+        self.change_y = 0
+        self.move_left = False
+        self.move_right = False
+        self.move_up = False
+        self.move_down = False
+        self.last_move_up = False
+        self.jumps = self.JUMP_MAX
+        self.act_state = State.IDLE
+        self.facing_direction = facing_direction
+        self.scale = (
+            facing_direction * self.scale_fix[0],
+            self.scale_fix[1],
+        )
+
     def dieded(self):
         self.remove_from_sprite_lists()
         return super().dieded()
